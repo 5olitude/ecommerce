@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"context"
-	//"ecomerce/database"
 	"ecommerce/database"
 	"ecommerce/models"
+	generate "ecommerce/tokens"
 	"fmt"
 	"log"
 	"net/http"
@@ -81,6 +81,16 @@ func SignUp() gin.HandlerFunc {
 		user.Updated_At, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.ID = primitive.NewObjectID()
 		user.User_ID = user.ID.Hex()
-
+		token, refreshtoken, _ := generate.TokenGenerator(*user.Email, *user.First_Name, *user.Last_Name, user.User_ID)
+		user.Token = &token
+		user.Refresh_Token = &refreshtoken
+		_, inserterr := UserCollection.InsertOne(ctx, user)
+		if inserterr != nil {
+			msg := fmt.Sprintf("not created")
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			return
+		}
+		defer cancel()
+		c.JSON(http.StatusCreated, "Successfully Signed Up!!")
 	}
 }
