@@ -17,4 +17,5 @@ func main() {
 	router.Use(gin.Logger())
 	routes.UserRoutes(router)
 	router.Use(middleware.Authentication())
+	router.Run(":" + port)
 }
