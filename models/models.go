@@ -19,3 +19,11 @@ type User struct {
 	Updated_At    time.Time          `json:"updtaed_at"`
 	User_ID       string             `json:"user_id"`
 }
+
+type Product struct {
+	Product_ID   primitive.ObjectID `bson:"_id"`
+	Product_Name *string            `json:"product_name"`
+	Price        *uint64            `json:"price"`
+	Rating       *uint8             `json:"ratig"`
+	Image        *string            `json:"image"`
+}
