@@ -33,3 +33,8 @@ func UserData(client *mongo.Client, CollectionName string) *mongo.Collection {
 	return collection
 
 }
+
+func ProductData(client *mongo.Client, CollectionName string) *mongo.Collection {
+	var productcollection *mongo.Collection = client.Database("Ecommerce").Collection(CollectionName)
+	return productcollection
+}
