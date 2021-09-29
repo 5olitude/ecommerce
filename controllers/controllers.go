@@ -146,6 +146,7 @@ func ProductViewerAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 		var products models.Product
+		defer cancel()
 		if err := c.BindJSON(&products); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -159,5 +160,30 @@ func ProductViewerAdmin() gin.HandlerFunc {
 		}
 		defer cancel()
 		c.JSON(http.StatusOK, "Successfully added our Product Admin!!")
+	}
+}
+
+// The Function to list all the productsin the database
+//paging will be added and fixed soon
+
+func SearchProduct() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var productlist []models.Product
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		cursor, err := ProductCollection.Find(ctx, bson.D{{}})
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, "Someting Went Wrong Please Try After Some Time")
+			return
+		}
+		cursor.All(ctx, &productlist)
+		defer cursor.Close(ctx)
+		if err := cursor.Err(); err != nil {
+			c.IndentedJSON(400, "invalid")
+			return
+		}
+		defer cancel()
+		c.IndentedJSON(200, productlist)
+
 	}
 }
