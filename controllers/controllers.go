@@ -124,6 +124,24 @@ func Login() gin.HandlerFunc {
 	}
 }
 
+//This is function to add products
+//this is an admin part
+//json should look like this
+// post request : http://localhost:8080/admin/addproduct
+/*
+json
+
+{
+"product_name" : "pencil"
+"price"        : 98
+"rating"       : 10
+"image"        : "image-url"
+}
+
+
+
+
+*/
 func ProductViewerAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
