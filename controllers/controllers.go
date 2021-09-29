@@ -114,6 +114,7 @@ func Login() gin.HandlerFunc {
 		defer cancel()
 		if PasswordIsValid != true {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			fmt.Println(msg)
 			return
 		}
 		token, refreshToken, _ := generate.TokenGenerator(*founduser.Email, *founduser.First_Name, *founduser.Last_Name, founduser.User_ID)
@@ -185,5 +186,34 @@ func SearchProduct() gin.HandlerFunc {
 		defer cancel()
 		c.IndentedJSON(200, productlist)
 
+	}
+}
+
+// This is the function to search products based on alphabet name
+func SearchProductByQuery() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var searchproducts []models.Product
+		queryParam := c.Query("name")
+		if queryParam == "" {
+			c.Header("Content-Type", "application/json")
+			c.JSON(http.StatusNotFound, gin.H{"Error": "Invalid Search Index"})
+			c.Abort()
+			return
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		searchquerydb, err := ProductCollection.Find(ctx, bson.M{"product_name": bson.M{"$regex": queryParam}})
+		if err != nil {
+			c.IndentedJSON(404, "something went wrong in fetching the dbquery")
+			return
+		}
+		searchquerydb.All(ctx, &searchproducts)
+		defer searchquerydb.Close(ctx)
+		if err := searchquerydb.Err(); err != nil {
+			c.IndentedJSON(400, "invalid request")
+			return
+		}
+		defer cancel()
+		c.IndentedJSON(200, searchproducts)
 	}
 }
