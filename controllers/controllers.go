@@ -84,6 +84,7 @@ func SignUp() gin.HandlerFunc {
 		token, refreshtoken, _ := generate.TokenGenerator(*user.Email, *user.First_Name, *user.Last_Name, user.User_ID)
 		user.Token = &token
 		user.Refresh_Token = &refreshtoken
+		user.UserCart = make([]models.ProductUser, 0)
 		_, inserterr := UserCollection.InsertOne(ctx, user)
 		if inserterr != nil {
 			msg := fmt.Sprintf("not created")
@@ -215,5 +216,40 @@ func SearchProductByQuery() gin.HandlerFunc {
 		}
 		defer cancel()
 		c.IndentedJSON(200, searchproducts)
+	}
+}
+
+func AddToCart() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var productcart []models.ProductUser
+		productqueryid := c.Query("id")
+		userid := c.Query("normal")
+		productid, _ := primitive.ObjectIDFromHex(productqueryid)
+		if productqueryid == "" {
+			c.Header("Content-Type", "application/json")
+			c.JSON(http.StatusNotFound, gin.H{"Error": "Product Query not matched"})
+			c.Abort()
+			return
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		searchfromdb, err := ProductCollection.Find(ctx, bson.M{"_id": productid})
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, "Invalid ID refer")
+			return
+		}
+		searchfromdb.All(ctx, &productcart)
+		defer cancel()
+		id, err := primitive.ObjectIDFromHex(userid)
+		if err != nil {
+			fmt.Println(err)
+		}
+		filter := bson.D{primitive.E{Key: "_id", Value: id}}
+		update := bson.D{{"$push", bson.D{{"usercart", bson.D{{"$each", productcart}}}}}}
+		_, err = UserCollection.UpdateOne(ctx, filter, update)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, err)
+		}
+		c.IndentedJSON(200, "Successfully Added to the cart")
 	}
 }
