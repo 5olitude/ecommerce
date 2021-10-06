@@ -20,5 +20,6 @@ func main() {
 	router.Use(middleware.Authentication())
 	router.GET("/addtocart", controllers.AddToCart())
 	router.GET("/removeitem", controllers.RemoveItem())
+	router.GET("listcart", controllers.GetItemFromCart())
 	router.Run(":" + port)
 }
