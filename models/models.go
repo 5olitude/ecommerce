@@ -18,6 +18,7 @@ type User struct {
 	Created_At    time.Time          `json:"created_at"`
 	Updated_At    time.Time          `json:"updtaed_at"`
 	User_ID       string             `json:"user_id"`
+	UserCart      []ProductUser      `json:"usercart" bson:"usercart"`
 }
 
 type Product struct {
@@ -26,4 +27,12 @@ type Product struct {
 	Price        *uint64            `json:"price"`
 	Rating       *uint8             `json:"rating"`
 	Image        *string            `json:"image"`
+}
+
+type ProductUser struct {
+	Product_ID   primitive.ObjectID `bson:"_id"`
+	Product_Name *string            `json:"product_name" bson:"product_name"`
+	Price        int                `json:"price"  bson:"price"`
+	Rating       *uint              `json:"rating" bson:"rating"`
+	Image        *string            `json:"image"  bson:"image"`
 }
