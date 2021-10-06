@@ -44,6 +44,7 @@ func VerifyPassword(userpassword string, givenpassword string) (bool, string) {
 func SignUp() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
 		var user models.User
 		if err := c.BindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -99,6 +100,7 @@ func SignUp() gin.HandlerFunc {
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
 		var user models.User
 		var founduser models.User
 		if err := c.BindJSON(&user); err != nil {
@@ -251,5 +253,34 @@ func AddToCart() gin.HandlerFunc {
 			c.IndentedJSON(http.StatusInternalServerError, err)
 		}
 		c.IndentedJSON(200, "Successfully Added to the cart")
+	}
+}
+
+func RemoveItem() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		remove_id := c.Query("id")
+		user_id := c.Query("normal")
+		if remove_id == "" {
+			c.Header("Content-Type", "application/json")
+			c.JSON(http.StatusNotFound, gin.H{"Error": "Invalid Query"})
+			c.Abort()
+			return
+		}
+		removed_id, _ := primitive.ObjectIDFromHex(remove_id)
+		usert_id, err := primitive.ObjectIDFromHex(user_id)
+		if err != nil {
+			fmt.Println(err)
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		filter := bson.D{primitive.E{Key: "_id", Value: usert_id}}
+		update := bson.M{"$pull": bson.M{"usercart": bson.M{"_id": removed_id}}}
+		_, err = UserCollection.UpdateMany(ctx, filter, update)
+		if err != nil {
+			c.IndentedJSON(500, "Server Error")
+			return
+		}
+		c.IndentedJSON(200, "Successfully removed from cart")
+		defer cancel()
 	}
 }
