@@ -36,3 +36,11 @@ type ProductUser struct {
 	Rating       *uint              `json:"rating" bson:"rating"`
 	Image        *string            `json:"image"  bson:"image"`
 }
+
+type Address struct {
+	Address_id primitive.ObjectID `bson:"_id"`
+	House      *string            `json:"house_name" bson:"house_name"`
+	Street     *string            `json:"street_name" bson:"street_name"`
+	City       *string            `json:"city_name" bson:"city_name"`
+	Pincode    *string            `json:"pin_code" bson:"pin_code"`
+}
