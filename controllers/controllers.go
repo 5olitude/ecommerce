@@ -41,6 +41,21 @@ func VerifyPassword(userpassword string, givenpassword string) (bool, string) {
 	return valid, msg
 }
 
+/**********************************************************************************************/
+
+//function to signup
+//accept a post request
+//POST Request
+//http://localhost:8000/users/signnup
+/*
+   "fisrt_name":"joseph",
+   "last_name":"hermis",
+   "email":"something@gmail.com",
+   "phone":"1156422222",
+   "password":"hashed:)"
+
+*/
+
 func SignUp() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
@@ -98,6 +113,16 @@ func SignUp() gin.HandlerFunc {
 	}
 }
 
+/*********************************************************************************************************************************************************/
+
+//function to generate login and check the user to create necessary fields in the db mostly as empty array
+// Accepts a POST
+/*
+"email":"lololol@sss.com"
+"password":"coollcollcoll"
+
+*/
+
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
@@ -128,6 +153,8 @@ func Login() gin.HandlerFunc {
 
 	}
 }
+
+/*******************************************************************************************************/
 
 //This is function to add products
 //this is an admin part
@@ -222,6 +249,12 @@ func SearchProductByQuery() gin.HandlerFunc {
 	}
 }
 
+/**************************************************CART********************************************************************************************************/
+
+//function to add products to cart
+// GET request
+//http://localhost:8000/addtocart?id=xxxproduct_id&normal=xxxxxxuser_idxxxxxx
+
 func AddToCart() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var productcart []models.ProductUser
@@ -257,6 +290,11 @@ func AddToCart() gin.HandlerFunc {
 	}
 }
 
+/************************************************************************************************************************************/
+
+//function to remove item from cart
+//GET Request
+//http://localhost:8000/addtocart?id=xxxproduct_id&normal=xxxxxxuser_idxxxxxx
 func RemoveItem() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		remove_id := c.Query("id")
@@ -286,6 +324,11 @@ func RemoveItem() gin.HandlerFunc {
 	}
 }
 
+/***************************************************************************************************************/
+
+//function to get all items in the cart and total price
+//GET request
+//http://localhost:8000/listcart?id=xxxxxxuser_idxxxxxxxxxx
 func GetItemFromCart() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var filledcart models.User
@@ -322,6 +365,23 @@ func GetItemFromCart() gin.HandlerFunc {
 		ctx.Done()
 	}
 }
+
+/***********************************************************ADDRESS*************************************************************************/
+
+//function to add the address and limited to 2
+//home and work address
+/*
+{
+"house_name":"jupyterlab",
+"street_name":"notebook",
+"city_name":"josua",
+"pin_code":"685607"
+}
+The Post Request Url will look like this
+POST
+http://localhost:8000/addadress?id=user_id*************
+
+*/
 
 func AddAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -373,6 +433,22 @@ func AddAddress() gin.HandlerFunc {
 	}
 }
 
+/**********************************************************************************************************/
+
+//function to edit the address put request
+/*
+
+{
+"house_name":"jupyterlab",
+"street_name":"notebook",
+"city_name":"mars",
+"pin_code":"12231997"
+}
+PUT
+http://localhost:8000/edithomeaddress?id=xxxxxxxxxxxxxxxxxxxxxxxxx
+
+*/
+
 func EditHomeAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user_id := c.Query("id")
@@ -404,6 +480,22 @@ func EditHomeAddress() gin.HandlerFunc {
 		c.IndentedJSON(200, "Successfully Updated the Home address")
 	}
 }
+
+/*****************************************************************************************************/
+
+//function to edit the work address put request
+/*
+
+{
+"house_name":"jupyterlab",
+"street_name":"notebook",
+"city_name":"mars",
+"pin_code":"12231997"
+}
+PUT
+http://localhost:8000/editworkaddress?id=xxxxxxxxxxxxxxxxxxxxxxxxx
+
+*/
 
 func EditWorkAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -437,6 +529,12 @@ func EditWorkAddress() gin.HandlerFunc {
 	}
 }
 
+/********************************************************************************************/
+
+//function to delete the address here both the address will be removed fix soon
+//GET request
+//http://localhost:8000/deleteaddresses?id=xxxxxxxxxxxxxxxxxxxxxxxx
+
 func DeleteAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		user_id := c.Query("id")
@@ -465,3 +563,5 @@ func DeleteAddress() gin.HandlerFunc {
 		c.IndentedJSON(200, "Successfully Deleted!")
 	}
 }
+
+/***********************************************************************************************************************************************************************/
