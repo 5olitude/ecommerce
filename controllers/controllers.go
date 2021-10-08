@@ -634,3 +634,49 @@ func BuyFromCart() gin.HandlerFunc {
 
 	}
 }
+
+func InstantBuy() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		item_id := c.Query("pid")
+		user_id := c.Query("id")
+		if item_id == "" || user_id == "" {
+			c.Header("Content-Type", "application/json")
+			c.JSON(http.StatusNotFound, gin.H{"Error": "Invalid Code"})
+			c.Abort()
+			return
+		}
+		itemt_id, err := primitive.ObjectIDFromHex(item_id)
+		if err != nil {
+			c.IndentedJSON(500, "Internal Server Erroe")
+		}
+		usert_id, err := primitive.ObjectIDFromHex(user_id)
+		if err != nil {
+			c.IndentedJSON(500, "Internal Server Error")
+		}
+		var product_details models.ProductUser
+		var orders_detail models.Order
+		orders_detail.Order_ID = primitive.NewObjectID()
+		orders_detail.Orderered_At = time.Now()
+		orders_detail.Order_Cart = make([]models.ProductUser, 0)
+		orders_detail.Payment_Method.COD = true
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		err = ProductCollection.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: itemt_id}}).Decode(&product_details)
+		if err != nil {
+			c.IndentedJSON(400, "Something Wrong happened")
+		}
+		orders_detail.Price = product_details.Price
+		filter := bson.D{primitive.E{Key: "_id", Value: usert_id}}
+		update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "orders", Value: orders_detail}}}}
+		UserCollection.UpdateOne(ctx, filter, update)
+		ctx.Done()
+		filter2 := bson.D{primitive.E{Key: "_id", Value: usert_id}}
+		update2 := bson.M{"$push": bson.M{"orders.$[].order_list": product_details}}
+		_, err = UserCollection.UpdateOne(ctx, filter2, update2)
+		if err != nil {
+			c.IndentedJSON(400, "something wrong happened")
+		}
+		c.IndentedJSON(200, "Successully placed the order ")
+		defer cancel()
+
+	}
+}
