@@ -26,6 +26,7 @@ func main() {
 	router.PUT("editworkaddress", controllers.EditWorkAddress())
 	router.GET("deleteaddresses", controllers.DeleteAddress())
 	router.GET("cartcheckout", controllers.BuyFromCart())
+	router.GET("instantbuy", controllers.InstantBuy())
 	//break :)
 	router.Run(":" + port)
 }
