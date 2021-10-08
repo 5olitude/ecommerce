@@ -102,6 +102,7 @@ func SignUp() gin.HandlerFunc {
 		user.Refresh_Token = &refreshtoken
 		user.UserCart = make([]models.ProductUser, 0)
 		user.Address_Details = make([]models.Address, 0)
+		user.Order_Status = make([]models.Order, 0)
 		_, inserterr := UserCollection.InsertOne(ctx, user)
 		if inserterr != nil {
 			msg := fmt.Sprintf("not created")
@@ -565,3 +566,71 @@ func DeleteAddress() gin.HandlerFunc {
 }
 
 /***********************************************************************************************************************************************************************/
+
+func BuyFromCart() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user_id := c.Query("id")
+		if user_id == "" {
+			c.Header("Content-Type", "application/json")
+			c.JSON(http.StatusNotFound, gin.H{"error": "Invalid"})
+			c.Abort()
+			return
+		}
+		usert_id, err := primitive.ObjectIDFromHex(user_id)
+		if err != nil {
+			c.IndentedJSON(500, "Internal Server Error")
+		}
+		var getcartitems models.User
+		var ordercart models.Order
+		ordercart.Order_ID = primitive.NewObjectID()
+		ordercart.Orderered_At = time.Now()
+		ordercart.Order_Cart = make([]models.ProductUser, 0)
+		ordercart.Payment_Method.COD = true
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		unwind := bson.D{{Key: "$unwind", Value: bson.D{primitive.E{Key: "path", Value: "$usercart"}}}}
+		grouping := bson.D{{Key: "$group", Value: bson.D{primitive.E{Key: "_id", Value: "$_id"}, {Key: "total", Value: bson.D{primitive.E{Key: "$sum", Value: "$usercart.price"}}}}}}
+		currentresults, err := UserCollection.Aggregate(ctx, mongo.Pipeline{unwind, grouping})
+
+		ctx.Done()
+		if err != nil {
+			panic(err)
+		}
+		var getusercart []bson.M
+		if err = currentresults.All(ctx, &getusercart); err != nil {
+			panic(err)
+		}
+		var total_price int32
+		for _, user_item := range getusercart {
+			price := user_item["total"]
+			total_price = price.(int32)
+		}
+		ordercart.Price = int(total_price)
+		filter := bson.D{primitive.E{Key: "_id", Value: usert_id}}
+		update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "orders", Value: ordercart}}}}
+		UserCollection.UpdateMany(ctx, filter, update)
+		err = UserCollection.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: usert_id}}).Decode(&getcartitems)
+		if err != nil {
+			c.IndentedJSON(500, "something went wrong")
+		}
+		var ktx, kancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer kancel()
+		filter2 := bson.D{primitive.E{Key: "_id", Value: usert_id}}
+		update2 := bson.M{"$push": bson.M{"orders.$[].order_list": bson.M{"$each": getcartitems.UserCart}}}
+		_, err = UserCollection.UpdateOne(ctx, filter2, update2)
+		if err != nil {
+			c.IndentedJSON(500, "something went wrong")
+		}
+		usercart_empty := make([]models.ProductUser, 0)
+		filtered := bson.D{primitive.E{Key: "_id", Value: usert_id}}
+		updated := bson.D{{Key: "$set", Value: bson.D{primitive.E{Key: "usercart", Value: usercart_empty}}}}
+		_, err = UserCollection.UpdateOne(ctx, filtered, updated)
+		if err != nil {
+			c.IndentedJSON(500, "Internal Server Errror")
+		}
+
+		ktx.Done()
+		c.IndentedJSON(200, "Successfully Placed the order")
+
+	}
+}
