@@ -58,7 +58,9 @@
 
      - Pagination 1>>2>>3
      - Admin Part
-     - etc***
+     - OAuth 2
+     - etc*** 
+
 
     #### Packages Required?
     (github.com/dgrijalva/jwt-go) [moved to a new repo due to security implementations]
