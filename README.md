@@ -10,11 +10,11 @@
 ## **Fully functional ECOMMERCE API USING GIN FRAMEWORK AND MONGODB** ##
 
 
-<img src="https://github.com/5olitude/ecommerce/blob/main/rest.png"  alt="drawing" width="500"/>
+<img src="https://github.com/5olitude/ecommerce/blob/main/rest.png"  alt="drawing" width="500" height="300"/>
 
 -----**Initial  Release v2.30** ⚠️Not tested the efficiency
 
-***project  structure***
+# project  structure #
 
 
 * **Ecommerce** 📁
@@ -35,6 +35,8 @@
 
 
   ####   ``` Using Mongodb for small scale ecommerce industry is not a good idea instead use redis or mysql```
+
+  
 
   
   ## API FUNCTIONALITY CURRENTLY ADDED?
