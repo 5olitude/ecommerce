@@ -390,6 +390,11 @@ All the routes defined here requires the api authentication key
 
 ##
 
+
+
+
+**Living a Social Media free life , if you wish to contact me for prograamming related queries just mail me here josephhermis11@protonmail.com , always happy to help**
+
 #### Here are some of the reference i gone through while working on this project
 
 JWT Authentication using golang [^1]
