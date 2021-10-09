@@ -404,6 +404,10 @@ Mongo Go official go documentation    [^6]
 
 Is "logout" useless on a REST API? [^7]
 
+JWT AUTHENTICATION OFFICIAL        [^8]
+
+Gin framework Documentation        [^9]
+
 [^1]: https://dev.to/joojodontoh/build-user-authentication-in-golang-with-jwt-and-mongodb-2igd
 
 [^2]:https://www.mongodb.com/blog/post/quick-start-golang-mongodb-starting-and-setup
@@ -417,5 +421,9 @@ Is "logout" useless on a REST API? [^7]
 [^6]:https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo
 
 [^7]:https://stackoverflow.com/questions/36294359/is-logout-useless-on-a-rest-api
+
+[^8]:github.com/golang-jwt/jwt
+
+[^9]:https://github.com/gin-gonic/gin
 
 
