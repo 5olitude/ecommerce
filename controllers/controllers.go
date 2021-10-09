@@ -300,7 +300,7 @@ func RemoveItem() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		remove_id := c.Query("id")
 		user_id := c.Query("normal")
-		if remove_id == "" {
+		if remove_id == "" || user_id == "" {
 			c.Header("Content-Type", "application/json")
 			c.JSON(http.StatusNotFound, gin.H{"Error": "Invalid Query"})
 			c.Abort()
