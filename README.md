@@ -10,7 +10,7 @@
 ## **Fully functional ECOMMERCE API USING GIN FRAMEWORK AND MONGODB** ##
 
 
-<img src="https://github.com/5olitude/ecommerce/blob/main/rest.png" alt="drawing" width="50"/>
+<img src="https://github.com/5olitude/ecommerce/blob/main/rest.png" alt="drawing" width="200"/>
 
 -----**Initial  Release v2.30** ⚠️Not tested the efficiency
 
