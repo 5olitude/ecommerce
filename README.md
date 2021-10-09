@@ -47,19 +47,19 @@
      - etc***
 
     #### Packages Required?
-    github.com/dgrijalva/jwt-go (moved to a new repo due to security implementations)
+    (github.com/dgrijalva/jwt-go) [moved to a new repo due to security implementations]
 
-	github.com/gin-gonic/gin v1.7.4 (Framework in golang -gin used for rest api implementation )
+	(github.com/gin-gonic/gin v1.7.4)[Framework in golang -gin used for rest api]implementation )
 
-	github.com/go-playground/validator/v10 v10.9.0  (Validating the users struct such as email , phone etc)
+	(github.com/go-playground/validator/v10 v10.9.0)[Validating the users struct such as email , phone etc]
 
-	go.mongodb.org/mongo-driver v1.7.2 (go driver for database connection with mongodb(database))
+	(go.mongodb.org/mongo-driver v1.7.2)[go driver for database connection with mongodb]
 
-    go.mongodb.org/mongo-driver/mongo
+  (go.mongodb.org/mongo-driver/mongo)
 
-    go.mongodb.org/mongo-driver/mongo/options
+  (go.mongodb.org/mongo-driver/mongo/options)
 
-	golang.org/x/crypto (Encrypting the users pssword)
+	(golang.org/x/crypto) [Encrypting the users pssword]
 
     go version 1.16
 
