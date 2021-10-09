@@ -82,7 +82,7 @@
     ## Code At  glance in Database(database.go)
 
     first we need to define the database , make sure the mongodb installed in your system.
-    The important thing we have to remember is we need to create  a database as well as two collections  , Two collections that is one for storing the user informations and the other for storing the product informations.We must have to configure the url and port where mongo is running
+    The important thing we have to remember is we need to create  a database with two collections  , Two collections that for storing the user informations and the other for storing the product informations.We must have to configure the url and port of mongodb configured in your system
 
         //code example of url and port in databasetup.go
              mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017")) --port and url
@@ -93,7 +93,7 @@
     https://www.mongodb.com/blog/post/quick-start-golang-mongodb-starting-and-setup
 
     ## Code At glance in models.go
-    This part defines us how should our database looks like, I think its not about programming skills but if you have creativity and basic syntax ideas and have some ability to defines struct from creativity 90% of work completed.Before Jumping into other codes we should have a rough idea about our plan so its better to lookup into models .
+    This part defines us how should our database looks like, I think its not about programming skills, but if you have creativity and basic syntax ideas and have some ability to defines struct from creativity 90% of work completed.Before Jumping into other codes we should have a rough idea about our plan so its better to lookup into models .
 
  - We have to define a product first , having a unique id , name and price
 
@@ -125,7 +125,7 @@
 	    Pincode    *string            `json:"pin_code" bson:"pin_code"`
         }
        
-- If the user has ordered something the struct look like this  having an embedded struct inside a struct , here we define the ProductUser as a slice(A person can buy more than one product right?) and a payement struct to define Cash on delivery or digital payement
+- If the user has ordered something the struct look like the one in below,  having an embedded struct inside a struct , here we define the ProductUser as a slice(A person can buy more than one product right?) and a payement struct to define Cash on delivery or digital payement
 
          type Order struct {
 	        Order_ID       primitive.ObjectID `bson:"_id"`
@@ -172,7 +172,7 @@ The Payement struct is something look like this
    This file mainly describes about the token authentication process . We have used the JWT authentication from dgrijalwa but now the repository has changed . I have used the same implemtaion for signup and login from 
     https://dev.to/joojodontoh/build-user-authentication-in-golang-with-jwt-and-mongodb-2igd , this blog is clear and precise about jwt auhentication rather than my explanation here.
 
-  ***There is an important think we have to remember when defining  array struct  the mongodb converts the array to a nil in document field***
+  ***There is an important thing we have to remember when defining  array struct  the mongodb converts the array to a nil in document field***
 
   So  to overcome this problem we make an empty array in signup function like this,whever a user calls the signup function it initialise the documents to empty array
 
