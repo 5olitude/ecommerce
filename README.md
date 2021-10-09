@@ -9,7 +9,7 @@
 
 ## **Fully functional ECOMMERCE API USING GIN FRAMEWORK AND MONGODB** ##
 
-![GOPHER BUY RELAX](https://github.com/5olitude/ecommerce/blob/main/rest.png)
+![GOPHER BUY RELAX](https://github.com/5olitude/ecommerce/blob/main/rest.png){:height="36px" width="36px"}
 
 -----**Initial  Release v2.30** ⚠️Not tested the efficiency
 
