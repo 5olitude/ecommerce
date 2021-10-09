@@ -680,3 +680,30 @@ func InstantBuy() gin.HandlerFunc {
 
 	}
 }
+
+/*****BLACKLIST************
+func Logout() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		user_id := c.Query("id")
+		if user_id == "" {
+			c.Header("Content-Type", "application-json")
+			c.JSON(http.StatusNoContent, gin.H{"Error": "Invalid"})
+			c.Abort()
+			return
+		}
+		usert_id, err := primitive.ObjectIDFromHex(user_id)
+		if err != nil {
+			c.IndentedJSON(500, "Something Went Wrong")
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		filter := bson.D{{"_id", usert_id}}
+		update := bson.D{{"$unset", bson.D{{"token", ""}, {"refresh_token", ""}}}}
+		_, err = UserCollection.UpdateOne(ctx, filter, update)
+		if err != nil {
+			c.IndentedJSON(500, err)
+		}
+
+	}
+}
+//***************/
