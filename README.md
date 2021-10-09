@@ -36,7 +36,7 @@
 
   ####   ``` Using Mongodb for small scale ecommerce industry is not a good idea instead use redis or mysql```
 
-  
+
 
   
   ## API FUNCTIONALITY CURRENTLY ADDED?
@@ -384,5 +384,38 @@ The corresponding Query to mongodb is **ProductCollection.Find(ctx, bson.M{"prod
 ##   Code At Glance in main.go
 
 All the routes defined here requires the api authentication key 
+
+
+##
+
+#### Here are some of the reference i gone through while working on this project
+
+JWT Authentication using golang [^1]
+
+MongoDB Quick Introduction with Golang official blog [^2]
+
+Package context instead of goroutine [^3]
+
+Context use cases in real scenarios [^4]
+
+Mongo GO Driver official Documentation [^5]
+
+Mongo Go official go documentation    [^6]
+
+Is "logout" useless on a REST API? [^7]
+
+[^1]: https://dev.to/joojodontoh/build-user-authentication-in-golang-with-jwt-and-mongodb-2igd
+
+[^2]:https://www.mongodb.com/blog/post/quick-start-golang-mongodb-starting-and-setup
+
+[^3]:https://pkg.go.dev/context
+
+[^4]:https://levelup.gitconnected.com/context-in-golang-98908f042a57
+
+[^5]:https://docs.mongodb.com/drivers/go/current/
+
+[^6]:https://pkg.go.dev/go.mongodb.org/mongo-driver/mongo
+
+[^7]:https://stackoverflow.com/questions/36294359/is-logout-useless-on-a-rest-api
 
 
