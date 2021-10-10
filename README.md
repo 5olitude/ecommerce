@@ -34,6 +34,14 @@
   - main.go📝
 
 
+```
+clone this repo and change into the directory ecommerce-main***
+make sure go is installed in your system
+Run
+
+-#  go mod tidy
+-#  go run main.go
+```
   ####   ``` Using Mongodb for small scale ecommerce industry is not a good idea instead use redis or mysql```
 
 
