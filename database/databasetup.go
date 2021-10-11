@@ -11,8 +11,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func DbSet() *mongo.Client {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+// DBSet is more Go-like compared to DBSet. Take a look at https://pkg.go.dev/database/sql@go1.17.2#OpenDB for example. Abbreviations are written in allcaps in Go. Examples: http.ServeTLS(), time.UTC
+func DBSet() *mongo.Client {
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://development:testpassword@localhost:27017"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,11 +23,22 @@ func DbSet() *mongo.Client {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = client.Ping(context.TODO(), nil)
+	if err != nil {
+		log.Println("failed to connect to mongodb")
+		return nil
+	}
+
+	// This doesn't work, even if you don't have mongodb running this line still prints.
 	fmt.Println("Successfully Connected to the mongodb")
 	return client
 }
 
-var Client *mongo.Client = DbSet()
+// This is a global var, don't use global vars for database connections.
+// Instead use dependency injection to give your HTTP handlers access to
+// the mongodb connection pool.
+var Client *mongo.Client = DBSet()
 
 func UserData(client *mongo.Client, CollectionName string) *mongo.Collection {
 	var collection *mongo.Collection = client.Database("Ecommerce").Collection(CollectionName)
