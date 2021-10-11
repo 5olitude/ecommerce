@@ -19,6 +19,10 @@ func main() {
 		port = "8000"
 	}
 
+	// This is still a bad way of dependency injection because I would break a
+	// lot of your code if I would do it properly. You want to create your
+	// database connection in your main.go file and give the database client
+	// to the database.ProductData and database.UserData functions.
 	app := controllers.NewApplication(database.ProductData(database.Client, "Products"), database.UserData(database.Client, "Users"))
 
 	router := gin.New()
