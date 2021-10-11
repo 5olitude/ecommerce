@@ -2,8 +2,10 @@ package main
 
 import (
 	"ecommerce/controllers"
+	"ecommerce/database"
 	"ecommerce/middleware"
 	"ecommerce/routes"
+	"log"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -16,13 +18,16 @@ func main() {
 	if port == "" {
 		port = "8000"
 	}
+
+	app := controllers.NewApplication(database.ProductData(database.Client, "Products"), database.UserData(database.Client, "Users"))
+
 	router := gin.New()
 	router.Use(gin.Logger())
 	routes.UserRoutes(router)
 	// The authentication middleware is applied to all routes, including the /users/signup route. So nobody can actually use the application.
 	router.Use(middleware.Authentication())
 	// Your routes are inconsistent starting with and without '/'.
-	router.GET("/addtocart", controllers.AddToCart())
+	router.GET("/addtocart", app.AddToCart())
 	router.GET("/removeitem", controllers.RemoveItem())
 	router.GET("listcart", controllers.GetItemFromCart())
 	router.POST("addaddress", controllers.AddAddress())
@@ -33,5 +38,7 @@ func main() {
 	router.GET("instantbuy", controllers.InstantBuy())
 	//router.GET("logout", controllers.Logout())
 	//break :)
-	router.Run(":" + port)
+
+	// Log the error that the router can possibly return.
+	log.Fatal(router.Run(":" + port))
 }

@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"context"
+	"ecommerce/database"
 	"ecommerce/models"
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -13,51 +15,63 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+type Application struct {
+	prodCollection *mongo.Collection
+	userCollection *mongo.Collection
+}
+
+func NewApplication(prodCollection, userCollection *mongo.Collection) *Application {
+	return &Application{
+		prodCollection: prodCollection,
+		userCollection: userCollection,
+	}
+}
+
 // AddToCart adds products to the cart of the user.
 // GET request
 // http://localhost:8000/addtocart?id=xxxproduct_id&normal=xxxxxxuser_idxxxxxx
-func AddToCart() gin.HandlerFunc {
+// I add dependency to this handler to show you how much simpler your handler
+// become. Your handlers should validate input call one or two functions.
+// These business logic functions return an answer and probably an error.
+// Your handler should then handle the error and construct a repsonse that
+// matches the output and error.
+func (app *Application) AddToCart() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var productcart []models.ProductUser
-		productqueryid := c.Query("id")
-		userid := c.Query("normal")
-		productid, _ := primitive.ObjectIDFromHex(productqueryid)
-		if productqueryid == "" {
-			c.Header("Content-Type", "application/json")
-			c.JSON(http.StatusNotFound, gin.H{"Error": "Product Query not matched"})
-			c.Abort()
+		// Validate the input of the user
+		productQueryID := c.Query("id")
+		if productQueryID == "" {
+			log.Println("product id is empty")
+			// Gin has this c.Errors that is supposed to be used to catch
+			// all errors that are generated in your handler. I don't understand
+			// why you would use that so I'm ignoring it here.
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("product id is empty"))
 			return
 		}
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+
+		// Why is this called normal and not userID?
+		userQueryID := c.Query("normal")
+		if userQueryID == "" {
+			log.Println("user id is empty")
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("user id is empty"))
+			return
+		}
+		// Don't ignore errors!
+		productID, err := primitive.ObjectIDFromHex(productQueryID)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		// Do your database queries
+		var ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
 		// You have sometimes multiple defer cancel() in your functions.
 		defer cancel()
-		searchfromdb, err := ProductCollection.Find(ctx, bson.M{"_id": productid})
-		if err != nil {
-			log.Println(err)
-			c.IndentedJSON(http.StatusNotFound, "Invalid ID refer")
-			return
-		}
-		err = searchfromdb.All(ctx, &productcart)
-		if err != nil {
-			log.Println(err)
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
 
-		id, err := primitive.ObjectIDFromHex(userid)
+		err = database.AddProductToCart(ctx, app.prodCollection, app.userCollection, productID, userQueryID)
 		if err != nil {
-			log.Println(err)
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-
-		filter := bson.D{primitive.E{Key: "_id", Value: id}}
-		update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "usercart", Value: bson.D{{Key: "$each", Value: productcart}}}}}}
-		_, err = UserCollection.UpdateOne(ctx, filter, update)
-		if err != nil {
-			// Again giving the user the error that the database returns
-			// is not good idea. Gives normal user useless information
-			// and bad users too much information.
+			// This error is actually controlled by us so we don't leak any
+			// sensitive information about our mongodb server or what went wrong.
 			c.IndentedJSON(http.StatusInternalServerError, err)
 		}
 		c.IndentedJSON(200, "Successfully Added to the cart")
