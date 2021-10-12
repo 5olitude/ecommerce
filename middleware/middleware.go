@@ -2,7 +2,6 @@ package middleware
 
 import (
 	token "ecommerce/tokens"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +11,7 @@ func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ClientToken := c.Request.Header.Get("token")
 		if ClientToken == "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("No Authorization Header Provided")})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "No Authorization Header Provided"})
 			c.Abort()
 			return
 		}
@@ -22,6 +21,8 @@ func Authentication() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		// Why do you add so many claims to your JWT token?
+		// Is just the email or uid (which I assume are both unique) and fetch the user if you need to get more data from the user?
 		c.Set("email", claims.Email)
 		c.Set("first_name", claims.First_Name)
 		c.Set("last_name", claims.Last_Name)

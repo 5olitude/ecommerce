@@ -3,7 +3,6 @@ package token
 import (
 	"context"
 	"ecommerce/database"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -42,8 +41,13 @@ func TokenGenerator(email string, firstname string, lastname string, uid string)
 		},
 	}
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(SECRET_KEY))
+	if err != nil {
+		return "", "", err
+	}
 	refreshtoken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshclaims).SignedString([]byte(SECRET_KEY))
 	if err != nil {
+		// Try to reduce your panic and return an error to the user instead so your application stays running.
+		// It looks like Gin doesn't recover from panic's automatically so your website will crash if jwt.NewWithClaims returns an error.
 		log.Panicln(err)
 		return
 	}
@@ -61,13 +65,11 @@ func ValidateToken(signedtoken string) (claims *SignedDetails, msg string) {
 	}
 	claims, ok := token.Claims.(*SignedDetails)
 	if !ok {
-		msg = fmt.Sprintf("The Token is invalid")
-		msg = err.Error()
+		msg = "The Token is invalid"
 		return
 	}
 	if claims.ExpiresAt < time.Now().Local().Unix() {
-		msg = fmt.Sprintf("token is expired")
-		msg = err.Error()
+		msg = "token is expired"
 		return
 	}
 	return claims, msg
@@ -76,17 +78,17 @@ func ValidateToken(signedtoken string) (claims *SignedDetails, msg string) {
 func UpdateAllTokens(signedtoken string, signedrefreshtoken string, userid string) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	var updateobj primitive.D
-	updateobj = append(updateobj, bson.E{"token", signedtoken})
-	updateobj = append(updateobj, bson.E{"refresh_token", signedrefreshtoken})
+	updateobj = append(updateobj, bson.E{Key: "token", Value: signedtoken})
+	updateobj = append(updateobj, bson.E{Key: "refresh_token", Value: signedrefreshtoken})
 	updated_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-	updateobj = append(updateobj, bson.E{"updatedat", updated_at})
+	updateobj = append(updateobj, bson.E{Key: "updatedat", Value: updated_at})
 	upsert := true
 	filter := bson.M{"user_id": userid}
 	opt := options.UpdateOptions{
 		Upsert: &upsert,
 	}
 	_, err := UserData.UpdateOne(ctx, filter, bson.D{
-		{"$set", updateobj},
+		{Key: "$set", Value: updateobj},
 	},
 		&opt)
 	defer cancel()
