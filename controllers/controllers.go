@@ -5,7 +5,6 @@ import (
 	"ecommerce/database"
 	"ecommerce/models"
 	generate "ecommerce/tokens"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -73,30 +72,16 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 
-		result := UserCollection.FindOne(ctx, bson.M{"email": user.Email})
-		err := result.Err()
+		count, err := UserCollection.CountDocuments(ctx, bson.M{"email": user.Email})
 		if err != nil {
-			if errors.Is(err, mongo.ErrNoDocuments) {
-				log.Println("cannot find user")
-				// Actually returning the really error is a bad idea because it
-				// can give a bad guy extra information
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-				return
-			}
-			log.Println("find user by email error:", err)
+			log.Panic(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
-
-		var userInDB *models.User
-		err = result.Decode(userInDB)
-		if err != nil {
-			log.Println("cannot decode user, error:", err)
-			c.AbortWithStatus(http.StatusInternalServerError)
-			return
+		if count > 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "User already exists"})
 		}
-
-		count, err := UserCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
+		count, err = UserCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
 		defer cancel()
 		if err != nil {
 			log.Panic(err)
@@ -107,7 +92,6 @@ func SignUp() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Phone is already in use"})
 			return
 		}
-
 		// It doesn't make sense to hash the password while still checking if
 		// the phone number exists or not. So I moved it down a bit.
 		password := HashPassword(*user.Password)
