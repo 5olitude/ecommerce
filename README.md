@@ -318,7 +318,7 @@ The corresponding Query to mongodb is **ProductCollection.Find(ctx, bson.M{"prod
 
 - **Adding the Products to the Cart (GET REQUEST)**
 
-  http://localhost:8000/addtocart?id=xxxproduct_id&normal=xxxxxxuser_idxxxxxx
+  http://localhost:8000/addtocart?id=xxxproduct_idxxx&userID=xxxxxxuser_idxxxxxx
 
   Corresponding mongodb query
 
@@ -330,7 +330,7 @@ _, err = UserCollection.UpdateOne(ctx, filter, update)
 
 - **Removing Item From the Cart (GET REQUEST)**
 
-  http://localhost:8000/addtocart?id=xxxproduct_id&normal=xxxxxxuser_idxxxxxx
+  http://localhost:8000/addtocart?id=xxxxxxx&userID=xxxxxxxxxxxx
 
   Corresponding mongodb query
 
@@ -388,7 +388,7 @@ _, err = UserCollection.UpdateMany(ctx, filter, update)
   http://localhost:8000?id=xxuser_idxxx
 
 - **Instantly Buying the Products(GET REQUEST)**
-  http://localhost:8000?pid=xxproduct_idxxx&id=xxxxuser_idxxxx
+  http://localhost:8000?userid=xxuser_idxxx&pid=xxxxproduct_idxxxx
 
 ## Code At Glance in main.go
 
